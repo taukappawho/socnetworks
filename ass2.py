@@ -41,38 +41,60 @@ print("Current time: ", curr_time)
 G = nx.DiGraph()
 
 # Fetch data from sbf_suggestion table
-suggestion_query = "SELECT suggestionId, body, author, title, category, votes FROM sbf_suggestion limit 10000"
+# suggestion_query = SELECT suggestionId, body, author, title, category, votes FROM sbf_suggestion limit 1000"
+suggestion_query = """SELECT suggestionId, body, author, title, category, votes
+FROM (
+    SELECT suggestionId, body, author, title, category, votes FROM sbf_suggestion
+    ORDER BY votes DESC
+    LIMIT 1000
+) AS highest_votes
+UNION ALL
+SELECT suggestionId, body, author, title, category, votes FROM (
+    SELECT suggestionId, body, author, title, category, votes FROM sbf_suggestion
+    ORDER BY votes asc
+    LIMIT 1000
+) AS lowest_votes;"""
 suggestions_data = fetch_data(suggestion_query)
 
 # Add nodes to the graph
-author=2
 suggestionId=0
+body=1
+author=2
 votes = 5
+idea_list = []
 for suggestion in suggestions_data:
-    add_edge(G, suggestion[suggestionId], suggestion[author], TextBlob(suggestion[1]).sentiment, suggestion[votes])
-
+    idea_list.append(suggestion[suggestionId])
+    add_edge(G, suggestion[suggestionId], suggestion[author], TextBlob(suggestion[body]).sentiment, suggestion[votes])
 num_suggestions = nx.number_of_edges(G)
 print("Num suggestions: ", num_suggestions)
+print("\tNum nodes: ", nx.number_of_nodes(G))
+print("\tNum Edges: ", nx.number_of_edges(G))
 
-comment_query = "select suggestionId, commentId, author, body from sbf_comment limit 10000"
+comment_query = "select suggestionId, commentId, author, body from sbf_comment"
 comment_data = fetch_data(comment_query)
+suggestionId = 0
 comment_text = 3
 for comment in comment_data:
-    sentiment = TextBlob(comment[comment_text]).sentiment.polarity
-    add_edge(G, comment[author], comment[suggestionId], sentiment, None)
+    if (G.has_node(comment[suggestionId])):
+        sentiment = TextBlob(comment[comment_text]).sentiment.polarity
+        add_edge(G, comment[author], comment[suggestionId], sentiment, None)
     # print(comment[comment_text][:40], ": ",sentiment)
 
 # Print info about the graph
+print("After comments")
 print("Number of nodes:", G.number_of_nodes())
 print("Number of edges:", G.number_of_edges())
 
 print("\n\nElapsed time: ", datetime.datetime.now() - curr_time)
 
-# x = nx.community.louvain_communities(G)
-# print(len(x))
-num = int(input("Suggestion: "))
-while 0< num <= num_suggestions:
+x = nx.community.louvain_communities(G)
+print(len(x))
+num = 1
+node_num = 0
 
+while num != 0:
+    num = idea_list[node_num]
+    node_num = node_num + 1
     nodes = list(G.predecessors(num)) + list(G.successors(num)) + [num]
     print("#nodes: ", len(nodes) - 1)
     edges = list(G.in_edges(num)) + list(G.out_edges(num))
@@ -83,12 +105,6 @@ while 0< num <= num_suggestions:
     print("sentiiments: ",sentiments)
     weights = nx.get_edge_attributes(subgraph, "weight")
     print("weights: ",weights)
-
-    # # Draw the subgraph
-    # pos = nx.spring_layout(subgraph)
-    # nx.draw(subgraph, pos, with_labels=True, node_color='lightblue', node_size=500)
-    # nx.draw_networkx_edges(subgraph, pos, edgelist=edges, edge_color='black', width=[subgraph.edges[edge]['weight'] for edge in edges])
-    # plt.show()
 
     # num = int(input("Suggestion: "))
 
@@ -106,20 +122,8 @@ while 0< num <= num_suggestions:
     
     plt.show()
     
-    num = int(input("Suggestion: "))
-
-# # Draw the graph
-# plt.figure(figsize=(10, 6))
-# pos = nx.spring_layout(G)  # Positions for all nodes
-# nx.draw(G, pos, with_labels=True, node_size=10, node_color='skyblue', font_size=5, font_weight='bold', edge_color='gray')
-
-# # Customize the plot
-# plt.title('Network Graph of Comments and Suggestions')
-# plt.axis('off')  # Turn off the axis
-# plt.tight_layout()  # Adjust layout to make sure everything fits without overlapping
-
-# # Display the plot
-# plt.show()
+    num = input("Suggestion: ")
+    num = 1
 
 # Close database connection
 conn.close()
