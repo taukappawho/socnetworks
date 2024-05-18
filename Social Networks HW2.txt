@@ -1,9 +1,0 @@
-Social Networks HW2
-
-https://www.google.com/search?q=my+starbucks+idea+network+analysis&rlz=1C1ONGR_enUS1066US1066&oq=my+starbucks+idea+network+analysis&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRigAdIBCTEwMzQxajBqNKgCALACAQ&sourceid=chrome&ie=UTF-8
-
-
-My Starbucks Idea : an Open Innovation Case-Study
-https://www.braineet.com/blog/my-starbucks-idea-case-study
-
-The objective of this study is to explore the factors that are keys for an idea to be implemented on an online crowdsourcing platform. A data set of 320 implemented ideas from My Starbucks Idea – an online crowdsourcing platform – has been analyzed. We find that only one out of 500 users’ submitted ideas are selected for implementation. The number of implemented ideas increases significantly at the early stage of the platform. At the mature stage, even though an increasing number of ideas are submitted, implemented ideas are proportionately low. Among the three categories of ideas – product, experience, and involvement – ideas of the product category are implemented with lower values of some associated variables than that of the experience category whereas those values in the involvement category are higher. Linked ideas need lower scores than sole ideas to get implemented. The chance that an idea to be implemented largely depends on votes received by and points earned on that idea.
